@@ -35,6 +35,8 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends cmake gcc
 RUN apt-get install -y --no-install-recommends g++
 RUN apt-get install -y --no-install-recommends make
+RUN apt-get install -y --no-install-recommends build-essential curl libcurl4-openssl-dev libssl-dev uuid-dev
+RUN ls /usr/lib
 COPY . /app
 RUN mkdir cmake
 WORKDIR /app/cmake
