@@ -1,0 +1,48 @@
+FROM ubuntu:xenial
+
+WORKDIR /app
+
+#####################################################################################
+## Installs Azure IoT source code.  (Likely not needed in real deploy container...)
+## Uses 'azureiot-preview' branch to get preview apt-get packages.  For GA, 
+## we should use repository ppa:aziotsdklinux/ppa-azureiot instead.
+#####################################################################################
+RUN apt-get update && \
+    apt-get install -y software-properties-common cmake gcc g++ gdb procps && \
+    add-apt-repository ppa:aziotsdklinux/azureiot-preview && \
+    apt-get update && \
+    apt-get install -y azure-iot-sdk-c-dev
+
+#####################################################################################
+## Install runtime dependencies IoT has.  Note for pure modules this is likely
+## not needed and could be removed as an optimization, but for Service SDK this is needed.
+#####################################################################################    
+RUN apt-get install -y libcurl3
+
+#####################################################################################
+## Remove cache directory 
+#####################################################################################    
+RUN rm -rf /var/lib/apt/lists/*
+
+#####################################################################################
+## Add the executable and startup script 
+#####################################################################################    
+ADD iothub_client_sample_module_sender.c /app
+ADD start.sh /app
+
+# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
+# RUN apt-get update
+# RUN apt-get install -y --no-install-recommends cmake gcc
+# RUN apt-get install -y --no-install-recommends g++
+# RUN apt-get install -y --no-install-recommends make
+# RUN apt-get install -y --no-install-recommends build-essential curl libcurl4-openssl-dev libssl-dev uuid-dev
+# RUN ls /usr/lib
+COPY . /app
+RUN mkdir cmake
+WORKDIR /app/cmake
+RUN cmake --version
+RUN cmake .. 
+RUN make
+
+CMD ["/app/start.sh"]
+

@@ -19,11 +19,11 @@ set(AZUREIOT_INC_FOLDER ".." "/usr/include/azureiot" "/usr/include/azureiot/inc"
 include_directories(${AZUREIOT_INC_FOLDER})
 
 set(iothub_client_sample_module_sender_c_files
-    ./iothub_client_sample_module_sender.c
+    ./iothub_client_sample_module_filter.c
 )
 
 set(iothub_client_sample_module_sender_h_files
-    ./iothub_client_sample_module_sender.h
+    ./iothub_client_sample_module_filter.h
 )
 
 add_executable(iothub_client_sample_module_sender ${iothub_client_sample_module_sender_c_files} ${iothub_client_sample_module_sender_h_files})
