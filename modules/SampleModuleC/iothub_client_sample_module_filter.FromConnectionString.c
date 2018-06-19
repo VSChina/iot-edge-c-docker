@@ -13,6 +13,11 @@
 #include "azure_c_shared_utility/shared_util_options.h"
 #include "iothubtransportmqtt.h"
 
+
+/*String containing Hostname, Device Id & Device Key, ModuleID, and GatewayHostName in the format:                          */
+/*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>;ModuleId=<Module_Id>;GatewayHostName=127.0.0.1" */
+static const char* connectionString = "[device connection string]";
+
 typedef struct FILTERED_MESSAGE_INSTANCE_TAG
 {
     IOTHUB_MESSAGE_HANDLE messageHandle;
@@ -148,14 +153,24 @@ static IOTHUB_MODULE_CLIENT_LL_HANDLE InitializeConnectionForFilter()
 {
     IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubModuleClientHandle;
 
+    char *connectionStringFromEnvironment = getenv("EdgeHubConnectionString");
+    if (connectionStringFromEnvironment != NULL)
+    {
+        connectionString = connectionStringFromEnvironment;
+    }
+
     if (platform_init() != 0)
     {
         printf("Failed to initialize the platform.\r\n");
         iotHubModuleClientHandle = NULL;
     }
-    else if ((iotHubModuleClientHandle = IoTHubModuleClient_LL_CreateFromEnvironment(MQTT_Protocol)) == NULL)
+    // else if ((iotHubModuleClientHandle = IoTHubModuleClient_LL_CreateFromEnvironment(MQTT_Protocol)) == NULL)
+    // {
+    //     printf("ERROR: IoTHubModuleClient_LL_CreateFromEnvironment failed\r\n");
+    // }
+    else if ((iotHubModuleClientHandle = IoTHubModuleClient_LL_CreateFromConnectionString(connectionString, MQTT_Protocol)) == NULL)
     {
-        printf("ERROR: IoTHubModuleClient_LL_CreateFromEnvironment failed\r\n");
+        printf("ERROR: IoTHubModuleClient_LL_CreateFromConnectionString(%s) failed\r\n", connectionString);
     }
     else
     {

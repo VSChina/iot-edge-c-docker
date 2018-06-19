@@ -17,6 +17,7 @@ RUN make
 FROM base
 WORKDIR /app
 COPY --from=build-env /app/cmake ./
+COPY start.sh ./
 
-CMD ["/app/start.sh"]
+CMD ["./iothub_client_sample_module_sender"]
 
