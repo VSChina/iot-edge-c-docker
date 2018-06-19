@@ -14,12 +14,17 @@ endmacro(compileAsC99)
 
 compileAsC99()
 
+add_library(my_parson
+    parson.c
+    parson.h
+)
+
 set(AZUREIOT_INC_FOLDER ".." "/usr/include/azureiot" "/usr/include/azureiot/inc")
 
 include_directories(${AZUREIOT_INC_FOLDER})
 
 set(iothub_client_sample_module_sender_c_files
-    ./iothub_client_sample_module_filter.c
+    ./iothub_client_sample_module_filter.byTemp.c
 )
 
 set(iothub_client_sample_module_sender_h_files
@@ -29,8 +34,8 @@ set(iothub_client_sample_module_sender_h_files
 add_executable(iothub_client_sample_module_sender ${iothub_client_sample_module_sender_c_files} ${iothub_client_sample_module_sender_h_files})
 
 target_link_libraries(iothub_client_sample_module_sender
+    my_parson
     iothub_client_mqtt_transport
-    iothub_client_http_transport
     iothub_client
     parson
     aziotsharedutil

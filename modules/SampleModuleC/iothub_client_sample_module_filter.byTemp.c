@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "parson.h"
 #include "iothub_module_client_ll.h"
 #include "iothub_client_options.h"
 #include "iothub_message.h"
@@ -17,6 +18,8 @@
 /*String containing Hostname, Device Id & Device Key, ModuleID, and GatewayHostName in the format:                          */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>;ModuleId=<Module_Id>;GatewayHostName=127.0.0.1" */
 static const char* connectionString = "[device connection string]";
+
+static double temperatureThreshold = 25;
 
 typedef struct FILTERED_MESSAGE_INSTANCE_TAG
 {
@@ -91,7 +94,31 @@ static FILTERED_MESSAGE_INSTANCE* CreateFilteredMessageInstance(IOTHUB_MESSAGE_H
             free(filteredMessageInstance);
             filteredMessageInstance = NULL;
         }
-        filteredMessageInstance->messageTrackingId = messagesReceivedByInput1Queue;
+        else
+        {
+            filteredMessageInstance->messageTrackingId = messagesReceivedByInput1Queue;
+            MAP_HANDLE propMap = IoTHubMessage_Properties(filteredMessageInstance->messageHandle);
+            unsigned const char* messageBody;
+            size_t contentSize;
+
+            if (IoTHubMessage_GetByteArray(message, &messageBody, &contentSize) != IOTHUB_MESSAGE_OK)
+            {
+                messageBody = "<null>";
+            }
+
+            JSON_Value *root_value = json_parse_string(messageBody);
+            JSON_Object *root_object = json_value_get_object(root_value);
+            if (json_object_dotget_value(root_object, "machine.temperature") != NULL) {
+                double temperature = json_object_dotget_number(root_object, "machine.temperature");
+                printf("machine.temperature----------value: %f\r\n", temperature);
+                if (temperature > temperatureThreshold) {
+                    if (Map_AddOrUpdate(propMap, "temperatureAlert", "true") != MAP_OK)
+                        {
+                            (void)printf("ERROR: Map_AddOrUpdate Failed!\r\n");
+                        }
+                }
+            }
+        }
     }
 
     return filteredMessageInstance;
@@ -119,7 +146,7 @@ static IOTHUBMESSAGE_DISPOSITION_RESULT InputQueue1FilterCallback(IOTHUB_MESSAGE
         // We filter out every other message.  Here we will send on.
         printf("Sending message (%zu) to the next stage in pipeline\n", messagesReceivedByInput1Queue);
 
-        clientResult = IoTHubModuleClient_LL_SendEventToOutputAsync(iotHubModuleClientHandle, message, "output1", SendConfirmationCallbackFromFilter, (void*)filteredMessageInstance);
+        clientResult = IoTHubModuleClient_LL_SendEventToOutputAsync(iotHubModuleClientHandle, filteredMessageInstance->messageHandle, "output1", SendConfirmationCallbackFromFilter, (void*)filteredMessageInstance);
         if (clientResult != IOTHUB_CLIENT_OK)
         {
             free(filteredMessageInstance);
@@ -135,6 +162,26 @@ static IOTHUBMESSAGE_DISPOSITION_RESULT InputQueue1FilterCallback(IOTHUB_MESSAGE
     messagesReceivedByInput1Queue++;
     return result;
 }
+
+static void moduleTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsigned char* payLoad, size_t size, void* userContextCallback)
+{
+    (void)userContextCallback;
+
+    printf("***************** Device Twin update received (state=%s, size=%zu): %s\r\n", 
+        ENUM_TO_STRING(DEVICE_TWIN_UPDATE_STATE, update_state), size, payLoad);
+    JSON_Value *root_value = json_parse_string(payLoad);
+    JSON_Object *root_object = json_value_get_object(root_value);
+    if (json_object_dotget_value(root_object, "desired.TemperatureThreshold") != NULL) {
+        temperatureThreshold = json_object_dotget_number(root_object, "desired.TemperatureThreshold");
+        printf("desired.TemperatureThreshold----------value: %f\r\n", temperatureThreshold);
+        
+    }
+    if (json_object_get_value(root_object, "TemperatureThreshold") != NULL) {
+        temperatureThreshold = json_object_get_number(root_object, "TemperatureThreshold");
+        printf("TemperatureThreshold----------value: %f\r\n", temperatureThreshold);
+    }
+}
+
 
 static IOTHUB_MODULE_CLIENT_LL_HANDLE InitializeConnectionForFilter()
 {
@@ -189,6 +236,11 @@ static int SetupCallbacksForInputQueues(IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubMod
     else if (IoTHubModuleClient_LL_SetMessageCallback(iotHubModuleClientHandle, DefaultMessageCallback, (void*)iotHubModuleClientHandle) != IOTHUB_CLIENT_OK)
     {
         printf("ERROR: IoTHubModuleClient_LL_SetMessageCallback(default)..........FAILED!\r\n");
+        ret = __FAILURE__;
+    }
+    else if (IoTHubModuleClient_LL_SetModuleTwinCallback(iotHubModuleClientHandle, moduleTwinCallback, (void*)iotHubModuleClientHandle) != IOTHUB_CLIENT_OK)
+    {
+        printf("ERROR: IoTHubModuleClient_LL_SetModuleTwinCallback(default)..........FAILED!\r\n");
         ret = __FAILURE__;
     }
     else
