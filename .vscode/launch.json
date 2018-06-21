@@ -2,11 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug IoT Edge Module SampleModuleC (.NET Core)",
-      "type": "coreclr",
+      "name": "Debug IoT Edge Module (C)",
+      "type": "cppdbg",
       "request": "attach",
+      "program": "./iothub_client_sample_module_sender",
       "processId": "${command:pickRemoteProcess}",
       "pipeTransport": {
+        "pipeCwd": "${workspaceFolder}",
         "pipeProgram": "docker",
         "pipeArgs": [
           "exec",
@@ -15,14 +17,34 @@
           "sh",
           "-c"
         ],
-        "debuggerPath": "~/vsdbg/vsdbg",
-        "pipeCwd": "${workspaceFolder}",
-        "quoteArgs": true
+        "debuggerPath": "/usr/bin/gdb"
       },
       "sourceFileMap": {
         "/app": "${workspaceFolder}/modules/SampleModuleC"
       },
-      "justMyCode": true
+      "linux": {
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      },
+      "osx": {
+        "MIMode": "lldb"
+      },
+      "windows": {
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      }
     }
   ]
 }

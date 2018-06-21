@@ -46,7 +46,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.SampleModuleC.amd64}",
-              "createOptions": ""
+              "createOptions": "{\"HostConfig\": {\"Privileged\": true}}"
             }
           }
         }
