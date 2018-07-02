@@ -13,7 +13,8 @@
 #include "azure_c_shared_utility/platform.h"
 #include "azure_c_shared_utility/shared_util_options.h"
 #include "iothubtransportmqtt.h"
-
+#include "iothub.h"
+#include "time.h"
 
 /*String containing Hostname, Device Id & Device Key, ModuleID, and GatewayHostName in the format:                          */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>;ModuleId=<Module_Id>;GatewayHostName=127.0.0.1" */
