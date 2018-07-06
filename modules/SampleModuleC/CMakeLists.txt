@@ -27,7 +27,7 @@ set(AZUREIOT_INC_FOLDER "/usr/include/azureiot" "/usr/include/azureiot/inc")
 include_directories(${AZUREIOT_INC_FOLDER})
 
 set(main_c_files
-    ./main.filter.c
+    ./main.pipe.c
 )
 
 add_executable(main ${main_c_files})
@@ -36,6 +36,7 @@ target_link_libraries(main
     my_parson
     iothub_client_mqtt_transport
     iothub_client
+    parson
     aziotsharedutil
     umqtt
     pthread

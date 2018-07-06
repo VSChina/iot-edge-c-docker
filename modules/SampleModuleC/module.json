@@ -4,10 +4,10 @@
     "image": {
         "repository": "formulahendry/samplemodulec",
         "tag": {
-            "version": "0.0.17",
+            "version": "0.0.18",
             "platforms": {
                 "amd64": "./Dockerfile.amd64",
-                "amd64-improve": "./Dockerfile.amd64.improve"
+                "amd64.debug": "./Dockerfile.amd64.debug"
             }
         },
         "buildOptions": []
