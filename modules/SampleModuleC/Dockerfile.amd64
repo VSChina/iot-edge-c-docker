@@ -2,7 +2,7 @@ FROM ubuntu:xenial AS base
 
 RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common
 RUN add-apt-repository -y ppa:aziotsdklinux/ppa-azureiot
-RUN apt-get update && apt-get install -y azure-iot-sdk-c-dev=0.2.0.0-7xenial
+RUN apt-get update && apt-get install -y azure-iot-sdk-c-dev=0.2.0.0-8xenial
 RUN apt-get install -y --no-install-recommends gdb
 
 FROM base AS build-env 
@@ -17,5 +17,5 @@ FROM base
 WORKDIR /app
 COPY --from=build-env /app ./
 
-CMD ["/app/start.sh"]
+CMD ["./main"]
 

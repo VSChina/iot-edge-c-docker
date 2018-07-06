@@ -14,6 +14,9 @@ endmacro(compileAsC99)
 
 compileAsC99()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_EDGE_MODULES")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_EDGE_MODULES")
+
 add_library(my_parson
     parson.c
     parson.h
@@ -23,17 +26,13 @@ set(AZUREIOT_INC_FOLDER ".." "/usr/include/azureiot" "/usr/include/azureiot/inc"
 
 include_directories(${AZUREIOT_INC_FOLDER})
 
-set(iothub_client_sample_module_sender_c_files
+set(main_c_files
     ./iothub_client_sample_module_filter.byTemp.c
 )
 
-set(iothub_client_sample_module_sender_h_files
-    ./iothub_client_sample_module_filter.h
-)
+add_executable(main ${main_c_files})
 
-add_executable(iothub_client_sample_module_sender ${iothub_client_sample_module_sender_c_files} ${iothub_client_sample_module_sender_h_files})
-
-target_link_libraries(iothub_client_sample_module_sender
+target_link_libraries(main
     my_parson
     iothub_client_mqtt_transport
     iothub_client
@@ -45,4 +44,8 @@ target_link_libraries(iothub_client_sample_module_sender
     ssl
     crypto
     m
+    prov_auth_client
+    hsm_security_client
+    uhttp
+    uuid
 )
