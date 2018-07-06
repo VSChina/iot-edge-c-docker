@@ -5,7 +5,7 @@
       "name": "Debug IoT Edge Module (C)",
       "type": "cppdbg",
       "request": "attach",
-      "program": "./iothub_client_sample_module_sender",
+      "program": "./main",
       "processId": "${command:pickRemoteProcess}",
       "pipeTransport": {
         "pipeCwd": "${workspaceFolder}",

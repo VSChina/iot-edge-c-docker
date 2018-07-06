@@ -22,12 +22,12 @@ add_library(my_parson
     parson.h
 )
 
-set(AZUREIOT_INC_FOLDER ".." "/usr/include/azureiot" "/usr/include/azureiot/inc")
+set(AZUREIOT_INC_FOLDER "/usr/include/azureiot" "/usr/include/azureiot/inc")
 
 include_directories(${AZUREIOT_INC_FOLDER})
 
 set(main_c_files
-    ./iothub_client_sample_module_filter.byTemp.c
+    ./main.filter.c
 )
 
 add_executable(main ${main_c_files})
@@ -36,7 +36,6 @@ target_link_libraries(main
     my_parson
     iothub_client_mqtt_transport
     iothub_client
-    parson
     aziotsharedutil
     umqtt
     pthread

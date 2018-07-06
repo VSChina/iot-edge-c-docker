@@ -16,10 +16,6 @@
 #include "iothub.h"
 #include "time.h"
 
-/*String containing Hostname, Device Id & Device Key, ModuleID, and GatewayHostName in the format:                          */
-/*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>;ModuleId=<Module_Id>;GatewayHostName=127.0.0.1" */
-static const char* connectionString = "[device connection string]";
-
 static double temperatureThreshold = 25;
 
 typedef struct FILTERED_MESSAGE_INSTANCE_TAG
@@ -153,12 +149,6 @@ static IOTHUB_MODULE_CLIENT_LL_HANDLE InitializeConnectionForFilter()
 {
     IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubModuleClientHandle;
 
-    char *connectionStringFromEnvironment = getenv("EdgeHubConnectionString");
-    if (connectionStringFromEnvironment != NULL)
-    {
-        connectionString = connectionStringFromEnvironment;
-    }
-
     if (platform_init() != 0)
     {
         printf("Failed to initialize the platform.\r\n");
@@ -208,7 +198,7 @@ static int SetupCallbacksForInputQueues(IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubMod
     return ret;
 }
 
-void iothub_client_sample_module_filter()
+void iothub_module()
 {
     IOTHUB_MODULE_CLIENT_LL_HANDLE iotHubModuleClientHandle;
 
@@ -238,6 +228,6 @@ void iothub_client_sample_module_filter()
 
 int main(void)
 {
-    iothub_client_sample_module_filter();
+    iothub_module();
     return 0;
 }
