@@ -50,7 +50,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.SampleModuleC.amd32v7}",
+              "image": "${MODULES.SampleModuleC.amd64.debug}",
               "createOptions": "{\"HostConfig\": {\"Privileged\": true}}"
             }
           }
