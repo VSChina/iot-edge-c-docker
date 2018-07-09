@@ -27,7 +27,7 @@ set(AZUREIOT_INC_FOLDER "/usr/include/azureiot" "/usr/include/azureiot/inc")
 include_directories(${AZUREIOT_INC_FOLDER})
 
 set(main_c_files
-    ./main.pipe.c
+    ./main.filter.c
 )
 
 add_executable(main ${main_c_files})
